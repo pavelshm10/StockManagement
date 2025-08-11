@@ -72,10 +72,6 @@
       "apps/backend/project.json",
       "nx/core/project-json"
     ],
-    "$schema": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
     "sourceRoot": [
       "apps/backend/project.json",
       "nx/core/project-json"
@@ -96,23 +92,11 @@
       "apps/backend/project.json",
       "nx/core/project-json"
     ],
+    "targets.build.outputs": [
+      "apps/backend/project.json",
+      "nx/core/project-json"
+    ],
     "targets.build.options": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.build.configurations": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.build.options.command": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.build.options.args": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.build.options.main": [
       "apps/backend/project.json",
       "nx/core/project-json"
     ],
@@ -120,11 +104,15 @@
       "apps/backend/project.json",
       "nx/core/project-json"
     ],
-    "targets.build.configurations.development": [
+    "targets.build.options.main": [
       "apps/backend/project.json",
       "nx/core/project-json"
     ],
-    "targets.build.configurations.development.args": [
+    "targets.build.options.tsConfig": [
+      "apps/backend/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.build.options.assets": [
       "apps/backend/project.json",
       "nx/core/project-json"
     ],
@@ -132,19 +120,7 @@
       "apps/backend/project.json",
       "nx/core/project-json"
     ],
-    "targets.serve.continuous": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
     "targets.serve.executor": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.serve.defaultConfiguration": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.serve.dependsOn": [
       "apps/backend/project.json",
       "nx/core/project-json"
     ],
@@ -152,33 +128,29 @@
       "apps/backend/project.json",
       "nx/core/project-json"
     ],
-    "targets.serve.configurations": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
     "targets.serve.options.buildTarget": [
       "apps/backend/project.json",
       "nx/core/project-json"
     ],
-    "targets.serve.options.runBuildTargetDependencies": [
+    "targets.serve.options.watch": [
       "apps/backend/project.json",
       "nx/core/project-json"
     ],
-    "targets.serve.configurations.development": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
+    "targets.build.cache": [
+      "nx.json",
+      "nx/target-defaults"
     ],
-    "targets.serve.configurations.development.buildTarget": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
+    "targets.build.dependsOn": [
+      "nx.json",
+      "nx/target-defaults"
     ],
-    "targets.serve.configurations.production": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
+    "targets.build.inputs": [
+      "nx.json",
+      "nx/target-defaults"
     ],
-    "targets.serve.configurations.production.buildTarget": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
+    "targets.build.parallelism": [
+      "nx.json",
+      "nx/target-defaults"
     ]
   },
   "libs": {

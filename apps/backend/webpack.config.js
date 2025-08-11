@@ -1,20 +1,36 @@
-const { NxAppWebpackPlugin } = require('@nx/webpack/app-plugin');
 const { join } = require('path');
 
 module.exports = {
+  entry: './src/main.ts',
   output: {
-    path: join(__dirname, '../dist/apps'),
+    path: join(__dirname, 'dist'),
+    filename: 'main.js',
   },
-  plugins: [
-    new NxAppWebpackPlugin({
-      target: 'node',
-      compiler: 'tsc',
-      main: './src/main.ts',
-      tsConfig: './tsconfig.app.json',
-      assets: ['./src/assets'],
-      optimization: false,
-      outputHashing: 'none',
-      generatePackageJson: true,
-    }),
+  target: 'node',
+  mode: 'development',
+  module: {
+    rules: [
+      {
+        test: /\.ts$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
+      },
+    ],
+  },
+  resolve: {
+    extensions: ['.ts', '.js'],
+  },
+  devtool: 'source-map',
+  externals: [
+    // Exclude optional microservice dependencies
+    '@grpc/grpc-js',
+    '@grpc/proto-loader',
+    'kafkajs',
+    'mqtt',
+    'nats',
+    'ioredis',
+    'amqplib',
+    'amqp-connection-manager',
+    '@nestjs/platform-socket.io',
   ],
 };

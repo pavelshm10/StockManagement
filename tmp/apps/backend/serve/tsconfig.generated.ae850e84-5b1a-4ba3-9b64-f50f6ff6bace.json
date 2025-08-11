@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "@stock-management/libs": [
+        "libs/src/index.ts"
+      ]
+    }
+  },
+  "extends": "../../../../apps/backend/tsconfig.app.json"
+}

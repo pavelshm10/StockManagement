@@ -1,5 +1,13 @@
 {
   "devDependencies": {
-    "@nx/vite": "^21.3.11"
+    "@nx/vite": "^21.3.11",
+    "ts-loader": "^9.5.2",
+    "ts-node": "^10.9.2"
+  },
+  "dependencies": {
+    "@nestjs/microservices": "^11.1.6",
+    "@nestjs/websockets": "^11.1.6",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2"
   }
 }
