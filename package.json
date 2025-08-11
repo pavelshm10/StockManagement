@@ -3,15 +3,19 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "start:backend": "cd apps/backend && npx ts-node --compiler-options '{\"module\":\"commonjs\"}' src/main.ts"
+    "start:backend": "cd apps/backend && npx ts-node --compiler-options '{\"module\":\"commonjs\"}' src/main.ts",
+    "start:frontend": "cd apps/frontend && npx vite"
   },
   "private": true,
   "dependencies": {
     "@nestjs/common": "^11.0.0",
+    "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.0",
-    "@nestjs/platform-express": "^11.0.0",
+    "@nestjs/mongoose": "^11.0.3",
+    "@nestjs/platform-express": "^11.1.6",
     "axios": "^1.6.0",
     "empty": "0.10.1",
+    "mongoose": "^8.17.1",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-router-dom": "6.29.0",
