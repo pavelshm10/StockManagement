@@ -1,0 +1,3 @@
+> webpack-cli build --main=apps/backend/src/main.ts --outputPath=dist/apps/backend --node-env=production
+
+[webpack-cli] [31mError: Unknown option '--main=apps/backend/src/main.ts'[39m

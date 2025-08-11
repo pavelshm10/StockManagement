@@ -1,0 +1,36 @@
+> vite
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mCannot find base config file "../tsconfig.base.json"[0m [tsconfig.json]
+
+    tsconfig.json:17:13:
+[37m      17 │   "extends": [32m"../tsconfig.base.json"[37m
+         ╵              [32m~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J
+  [32m[1mVITE[22m v6.3.5[39m  [2mready in [0m[1m286[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m4200[22m/[39m
+[2m[32m  ➜[39m[22m[2m  press [22m[1mh + enter[22m[2m to show help[22m
+TSConfckParseError: [31m  Failed to scan for dependencies from entries:
+  /Users/user/Documents/StockManagement/apps/frontend/index.html
+
+  [39mfailed to resolve "extends":"../tsconfig.base.json" in /Users/user/Documents/StockManagement/apps/frontend/tsconfig.json
+    at resolveExtends (file:///Users/user/Documents/StockManagement/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:8739:8)
+    at parseExtends (file:///Users/user/Documents/StockManagement/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:8674:24)
+    at parse$e (file:///Users/user/Documents/StockManagement/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:8531:23)
+    at async loadTsconfigJsonForFile (file:///Users/user/Documents/StockManagement/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:9360:38)
+    at async prepareEsbuildScanner (file:///Users/user/Documents/StockManagement/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:14259:26)
+    at async file:///Users/user/Documents/StockManagement/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:46985:28
+[1m[31mWatch error: Daemon closed the connection[39m[22m

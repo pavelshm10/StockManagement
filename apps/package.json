@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "@nx/vite": "^21.3.11"
+  }
+}

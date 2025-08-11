@@ -9,7 +9,9 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "webpack-cli build",
-        "args": ["--node-env=production"]
+        "args": ["--node-env=production"],
+        "main": "apps/backend/src/main.ts",
+        "outputPath": "dist/apps/backend"
       },
       "configurations": {
         "development": {
