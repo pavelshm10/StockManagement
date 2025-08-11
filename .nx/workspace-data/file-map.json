@@ -1,0 +1,250 @@
+{
+  "version": "6.0",
+  "nxVersion": "21.3.11",
+  "pathMappings": {
+    "@stock-management/libs": [
+      "libs/src/index.ts"
+    ]
+  },
+  "nxJsonPlugins": [
+    {
+      "name": "@nx/eslint/plugin",
+      "options": {
+        "targetName": "lint"
+      }
+    }
+  ],
+  "fileMap": {
+    "nonProjectFiles": [
+      {
+        "file": "package-lock.json",
+        "hash": "16882820759578314089"
+      },
+      {
+        "file": ".nx/workspace-data/parsed-lock-file.json",
+        "hash": "14215478702510739101"
+      },
+      {
+        "file": ".git/index.lock",
+        "hash": "3244421341483603138"
+      },
+      {
+        "file": "nx.json",
+        "hash": "17399512626550965735"
+      },
+      {
+        "file": ".nx/workspace-data/file-map.json",
+        "hash": "13050467035330883289"
+      },
+      {
+        "file": "tsconfig.base.json",
+        "hash": "227310624258255439"
+      },
+      {
+        "file": ".nx/workspace-data/project-graph.json",
+        "hash": "6772743667079698714"
+      },
+      {
+        "file": "package.json",
+        "hash": "16765924790521722423"
+      },
+      {
+        "file": ".nx/workspace-data/nx_files.nxt",
+        "hash": "5865763224086950226"
+      },
+      {
+        "file": ".nx/workspace-data/lockfile.hash",
+        "hash": "1561499018377438811"
+      },
+      {
+        "file": ".nx/workspace-data/d/server-process.json",
+        "hash": "13966711238467340858"
+      },
+      {
+        "file": "README.md",
+        "hash": "10164816445021363934"
+      },
+      {
+        "file": ".nx/workspace-data/eslint-2654242865465226088.hash",
+        "hash": "17691079150166686811"
+      },
+      {
+        "file": ".nx/workspace-data/source-maps.json",
+        "hash": "12673389167651504072"
+      }
+    ],
+    "projectFileMap": {
+      "apps": [
+        {
+          "file": "apps/frontend/eslint.config.mjs",
+          "hash": "8944620160701465",
+          "deps": [
+            "npm:@nx/eslint-plugin"
+          ]
+        },
+        {
+          "file": "apps/frontend/index.html",
+          "hash": "10552620562197693239"
+        },
+        {
+          "file": "apps/frontend/project.json",
+          "hash": "15309025376809808802"
+        },
+        {
+          "file": "apps/frontend/public/favicon.ico",
+          "hash": "9303420814833116677"
+        },
+        {
+          "file": "apps/frontend/src/app/app.module.css",
+          "hash": "8887387885984320532"
+        },
+        {
+          "file": "apps/frontend/src/app/app.tsx",
+          "hash": "11324434068044146496",
+          "deps": [
+            "npm:react-router-dom"
+          ]
+        },
+        {
+          "file": "apps/frontend/src/app/nx-welcome.tsx",
+          "hash": "14708174282304233720"
+        },
+        {
+          "file": "apps/frontend/src/assets/.gitkeep",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/frontend/src/main.tsx",
+          "hash": "6494962159756833686",
+          "deps": [
+            "npm:react",
+            "npm:react-router-dom",
+            "npm:react-dom"
+          ]
+        },
+        {
+          "file": "apps/frontend/src/styles.css",
+          "hash": "5195668842064076916"
+        },
+        {
+          "file": "apps/frontend/tsconfig.app.json",
+          "hash": "17534131638295275382"
+        },
+        {
+          "file": "apps/frontend/tsconfig.json",
+          "hash": "47723161924471509"
+        },
+        {
+          "file": "apps/frontend/vite.config.ts",
+          "hash": "7301167809507943199",
+          "deps": [
+            "npm:vite",
+            "npm:@vitejs/plugin-react",
+            "npm:@nx/vite"
+          ]
+        }
+      ],
+      "backend": [
+        {
+          "file": "apps/backend/assets/.gitkeep",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/backend/eslint.config.mjs",
+          "hash": "9036454466467975933"
+        },
+        {
+          "file": "apps/backend/project.json",
+          "hash": "8768115765442157801"
+        },
+        {
+          "file": "apps/backend/src/app/app.controller.ts",
+          "hash": "15276891910009544695",
+          "deps": [
+            "npm:@nestjs/common"
+          ]
+        },
+        {
+          "file": "apps/backend/src/app/app.module.ts",
+          "hash": "11673476679848632172",
+          "deps": [
+            "npm:@nestjs/common"
+          ]
+        },
+        {
+          "file": "apps/backend/src/app/app.service.ts",
+          "hash": "9967902337593410053",
+          "deps": [
+            "npm:@nestjs/common"
+          ]
+        },
+        {
+          "file": "apps/backend/src/main.ts",
+          "hash": "150780270862474464",
+          "deps": [
+            "npm:@nestjs/common",
+            "npm:@nestjs/core"
+          ]
+        },
+        {
+          "file": "apps/backend/tsconfig.app.json",
+          "hash": "5519104792858008127"
+        },
+        {
+          "file": "apps/backend/tsconfig.json",
+          "hash": "4276712839166217253"
+        },
+        {
+          "file": "apps/backend/webpack.config.js",
+          "hash": "13709796906543886460",
+          "deps": [
+            "npm:@nx/webpack"
+          ]
+        }
+      ],
+      "libs": [
+        {
+          "file": "libs/README.md",
+          "hash": "14566912593376534364"
+        },
+        {
+          "file": "libs/eslint.config.mjs",
+          "hash": "9750370578825815921",
+          "deps": [
+            [
+              "npm:jsonc-eslint-parser",
+              "dynamic"
+            ]
+          ]
+        },
+        {
+          "file": "libs/package.json",
+          "hash": "12163613137787482263",
+          "deps": [
+            "npm:tslib"
+          ]
+        },
+        {
+          "file": "libs/project.json",
+          "hash": "7910997297152495946"
+        },
+        {
+          "file": "libs/src/index.ts",
+          "hash": "17589477408981871779"
+        },
+        {
+          "file": "libs/src/lib/libs.ts",
+          "hash": "5711823690029332260"
+        },
+        {
+          "file": "libs/tsconfig.json",
+          "hash": "14348528073521137485"
+        },
+        {
+          "file": "libs/tsconfig.lib.json",
+          "hash": "9908975088309596753"
+        }
+      ]
+    }
+  }
+}
