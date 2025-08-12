@@ -38,31 +38,16 @@ const Portfolio: React.FC = () => {
       }
     } catch (err) {
       throw err;
-    } 
+    }
   };
-
-  const addStock = async (stock: Omit<Stock, 'change'>) => {
-    if (!portfolio) return;
-    const newStock: Stock = {
-      ...stock,
-      change: 0,
-    };
-
-    const updatedStocks = [...portfolio.stocks, newStock];
-    const totalPrice = updatedStocks.reduce((sum, s) => sum + s.price, 0);
-    const percentageChange = updatedStocks.reduce(
-      (sum, s) => sum + s.change,
-      0
-    );
-  };
-
   return (
     <Box sx={{ p: 3, maxWidth: 1200, margin: '0 auto' }}>
       <Typography variant="h3" gutterBottom>
         Hello, {userId}
       </Typography>
 
-      {portfolio && <SearchStock onAddStock={addStock} />}
+      {/* Stock Search and Add Section */}
+      {portfolio && <SearchStock />}
 
       {portfolio && portfolio.stocks.length > 0 && (
         <Paper elevation={2} sx={{ p: 3 }}>
@@ -80,7 +65,7 @@ const Portfolio: React.FC = () => {
                   </TableCell>
                   <TableCell>
                     <Typography variant="subtitle1" fontWeight="bold">
-                      Price
+                      Quantity
                     </Typography>
                   </TableCell>
                   <TableCell>
@@ -92,24 +77,16 @@ const Portfolio: React.FC = () => {
               </TableHead>
               <TableBody>
                 {portfolio.stocks.map((stock, index) => (
-                  <TableRow key={index}>
+                  <TableRow key={stock.stock.symbol}>
                     <TableCell>
-                      <Typography variant="body1">{stock.name}</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body1" color="primary">
-                        ${stock.price.toFixed(2)}
+                      <Typography variant="body1">
+                        {stock.stock?.name}
                       </Typography>
                     </TableCell>
                     <TableCell>
-                      <Chip
-                        label={`${
-                          stock.change >= 0 ? '+' : ''
-                        }${stock.change.toFixed(2)}%`}
-                        color={stock.change >= 0 ? 'success' : 'error'}
-                        variant="outlined"
-                        size="small"
-                      />
+                      <Typography variant="body1" color="primary">
+                        ${stock.quantity}
+                      </Typography>
                     </TableCell>
                   </TableRow>
                 ))}

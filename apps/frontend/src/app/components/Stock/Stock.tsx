@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -11,6 +11,7 @@ import {
   Chip,
   Divider,
   IconButton,
+  TextField,
 } from '@mui/material';
 import {
   Close as CloseIcon,
@@ -23,7 +24,7 @@ interface StockProps {
   stock: StockDetail | null;
   open: boolean;
   onClose: () => void;
-  onAddToPortfolio?: (stock: StockDetail) => void;
+  onAddToPortfolio?: (stock: { name: string; quantity: number }) => void;
 }
 
 const Stock: React.FC<StockProps> = ({
@@ -32,13 +33,37 @@ const Stock: React.FC<StockProps> = ({
   onClose,
   onAddToPortfolio,
 }) => {
+  const [stockQuantity, setStockQuantity] = useState('1');
+  const [quantityError, setQuantityError] = useState<string | null>(null);
+
   if (!stock) return null;
 
   const handleAddToPortfolio = () => {
+    if (!stockQuantity || isNaN(parseFloat(stockQuantity))) {
+      setQuantityError('Please enter a valid quantity');
+      return;
+    }
+
+    if (parseFloat(stockQuantity) <= 0) {
+      setQuantityError('Quantity must be greater than 0');
+      return;
+    }
+
     if (onAddToPortfolio) {
-      onAddToPortfolio(stock);
+      onAddToPortfolio({
+        name: stock.name,
+        quantity: parseFloat(stockQuantity),
+      });
+
+      // Clear form and close modal
+      setStockQuantity('1');
       onClose();
     }
+  };
+
+  const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setStockQuantity(e.target.value);
+    setQuantityError(null);
   };
 
   return (
@@ -144,7 +169,7 @@ const Stock: React.FC<StockProps> = ({
                 Market Data
               </Typography>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                {stock.price && (
+                {stock.price && stock.price > 0 ? (
                   <Box
                     sx={{ display: 'flex', justifyContent: 'space-between' }}
                   >
@@ -158,8 +183,8 @@ const Stock: React.FC<StockProps> = ({
                       ${stock.price.toFixed(2)}
                     </Typography>
                   </Box>
-                )}
-                {stock.change !== undefined && (
+                ) : null}
+                {stock.change !== undefined && stock.change !== 0 ? (
                   <Box
                     sx={{
                       display: 'flex',
@@ -186,8 +211,8 @@ const Stock: React.FC<StockProps> = ({
                       />
                     </Box>
                   </Box>
-                )}
-                {stock.volume && (
+                ) : null}
+                {stock.volume && stock.volume > 0 ? (
                   <Box
                     sx={{ display: 'flex', justifyContent: 'space-between' }}
                   >
@@ -198,8 +223,8 @@ const Stock: React.FC<StockProps> = ({
                       {stock.volume.toLocaleString()}
                     </Typography>
                   </Box>
-                )}
-                {stock.marketCap && (
+                ) : null}
+                {stock.marketCap && stock.marketCap > 0 ? (
                   <Box
                     sx={{ display: 'flex', justifyContent: 'space-between' }}
                   >
@@ -207,10 +232,16 @@ const Stock: React.FC<StockProps> = ({
                       Market Cap:
                     </Typography>
                     <Typography variant="body1">
-                      ${(stock.marketCap / 1000000000).toFixed(2)}B
+                      {stock.marketCap >= 1000000000000
+                        ? `$${(stock.marketCap / 1000000000000).toFixed(2)}T`
+                        : stock.marketCap >= 1000000000
+                        ? `$${(stock.marketCap / 1000000000).toFixed(2)}B`
+                        : stock.marketCap >= 1000000
+                        ? `$${(stock.marketCap / 1000000).toFixed(2)}M`
+                        : `$${stock.marketCap.toLocaleString()}`}
                     </Typography>
                   </Box>
-                )}
+                ) : null}
               </Box>
             </Paper>
           </Box>
@@ -226,15 +257,15 @@ const Stock: React.FC<StockProps> = ({
                 Financial Metrics
               </Typography>
               <Box sx={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                {stock.pe && (
+                {stock.pe && stock.pe > 0 ? (
                   <Box sx={{ textAlign: 'center', minWidth: 120 }}>
                     <Typography variant="body2" color="text.secondary">
                       P/E Ratio
                     </Typography>
                     <Typography variant="h6">{stock.pe.toFixed(2)}</Typography>
                   </Box>
-                )}
-                {stock.dividend && (
+                ) : null}
+                {stock.dividend && stock.dividend > 0 ? (
                   <Box sx={{ textAlign: 'center', minWidth: 120 }}>
                     <Typography variant="body2" color="text.secondary">
                       Dividend Yield
@@ -243,10 +274,119 @@ const Stock: React.FC<StockProps> = ({
                       {stock.dividend.toFixed(2)}%
                     </Typography>
                   </Box>
-                )}
+                ) : null}
+                {stock.eps && stock.eps !== 0 ? (
+                  <Box sx={{ textAlign: 'center', minWidth: 120 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      EPS
+                    </Typography>
+                    <Typography variant="h6">
+                      ${stock.eps.toFixed(2)}
+                    </Typography>
+                  </Box>
+                ) : null}
               </Box>
             </Paper>
           )}
+
+          {/* Additional Market Data */}
+          {(stock.dayLow ||
+            stock.dayHigh ||
+            stock.yearLow ||
+            stock.yearHigh ||
+            stock.open ||
+            stock.previousClose) && (
+            <Paper elevation={1} sx={{ p: 2 }}>
+              <Typography
+                variant="h6"
+                gutterBottom
+                sx={{ color: 'primary.main' }}
+              >
+                Additional Market Data
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+                {stock.dayLow && stock.dayHigh ? (
+                  <Box sx={{ minWidth: 150 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      Day Range
+                    </Typography>
+                    <Typography variant="body1">
+                      ${stock.dayLow.toFixed(2)} - ${stock.dayHigh.toFixed(2)}
+                    </Typography>
+                  </Box>
+                ) : null}
+                {stock.yearLow && stock.yearHigh ? (
+                  <Box sx={{ minWidth: 150 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      52 Week Range
+                    </Typography>
+                    <Typography variant="body1">
+                      ${stock.yearLow.toFixed(2)} - ${stock.yearHigh.toFixed(2)}
+                    </Typography>
+                  </Box>
+                ) : null}
+                {stock.open ? (
+                  <Box sx={{ minWidth: 120 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      Open
+                    </Typography>
+                    <Typography variant="body1">
+                      ${stock.open.toFixed(2)}
+                    </Typography>
+                  </Box>
+                ) : null}
+                {stock.previousClose ? (
+                  <Box sx={{ minWidth: 120 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      Previous Close
+                    </Typography>
+                    <Typography variant="body1">
+                      ${stock.previousClose.toFixed(2)}
+                    </Typography>
+                  </Box>
+                ) : null}
+                {stock.avgVolume ? (
+                  <Box sx={{ minWidth: 120 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      Avg Volume
+                    </Typography>
+                    <Typography variant="body1">
+                      {stock.avgVolume.toLocaleString()}
+                    </Typography>
+                  </Box>
+                ) : null}
+              </Box>
+            </Paper>
+          )}
+
+          {/* Add to Portfolio Section */}
+          <Paper elevation={1} sx={{ p: 2 }}>
+            <Typography
+              variant="h6"
+              gutterBottom
+              sx={{ color: 'primary.main' }}
+            >
+              Add to Portfolio
+            </Typography>
+            <TextField
+              label="Quantity"
+              type="number"
+              value={stockQuantity}
+              onChange={handleQuantityChange}
+              error={!!quantityError}
+              helperText={quantityError}
+              fullWidth
+              margin="normal"
+            />
+            <Button
+              variant="contained"
+              onClick={handleAddToPortfolio}
+              fullWidth
+              sx={{ mt: 2 }}
+            >
+              Add to Portfolio
+            </Button>
+          </Paper>
         </Box>
       </DialogContent>
 
@@ -254,16 +394,6 @@ const Stock: React.FC<StockProps> = ({
         <Button onClick={onClose} variant="outlined">
           Close
         </Button>
-        {onAddToPortfolio && (
-          <Button
-            onClick={handleAddToPortfolio}
-            variant="contained"
-            color="primary"
-            startIcon={<TrendingUp />}
-          >
-            Add to Portfolio
-          </Button>
-        )}
       </DialogActions>
     </Dialog>
   );

@@ -17,26 +17,13 @@ export class PortfolioController {
 
   @Get(':user')
   async getPortfolio(@Param('user') user: string) {
-    const portfolio = await this.portfolioService.getPortfolio(user);
+    try {
+      const portfolio = await this.portfolioService.getPortfolio(user);
 
-    if (!portfolio) {
-      // Return 404 with proper JSON response
-      throw new HttpException(
-        {
-          error: 'Portfolio not found',
-          user: user,
-          message: 'No portfolio exists for this user',
-        },
-        HttpStatus.NOT_FOUND
-      );
+      return portfolio;
+    } catch (error) {
+      throw error;
     }
-
-    return portfolio;
-  }
-
-  @Get()
-  async getAllPortfolios(): Promise<Portfolio[]> {
-    return this.portfolioService.getAllPortfolios();
   }
 
   @Post()

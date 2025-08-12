@@ -4,6 +4,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PortfolioController } from './controllers/portfolio.controller';
 import { PortfolioService } from './services/portfolio.service';
+import { MongoDBService } from './services/mongodb.service';
 
 @Module({
   imports: [
@@ -11,8 +12,9 @@ import { PortfolioService } from './services/portfolio.service';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    // MongoDB connection handled manually in service to avoid dependency injection issues
   ],
   controllers: [AppController, PortfolioController],
-  providers: [AppService, PortfolioService],
+  providers: [AppService, MongoDBService, PortfolioService],
 })
 export class AppModule {}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   TextField,
   Button,
@@ -8,28 +8,46 @@ import {
   CircularProgress,
   Paper,
   Alert,
+  Chip,
 } from '@mui/material';
-import { Search as SearchIcon } from '@mui/icons-material';
 import ApiService from '../../../services/api.service';
 import Stock from '../Stock';
 import { StockSearchResult, StockDetail } from '@stock-management/libs';
 
 interface SearchStockProps {
-  onAddStock: (stock: { name: string; price: number }) => void;
 }
 
-const SearchStock: React.FC<SearchStockProps> = ({ onAddStock }) => {
+const SearchStock: React.FC<SearchStockProps> = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<StockSearchResult[]>([]);
   const [searching, setSearching] = useState(false);
   const [selectedStock, setSelectedStock] = useState<StockSearchResult | null>(
     null
   );
-  const [stockPrice, setStockPrice] = useState('');
   const [searchError, setSearchError] = useState<string | null>(null);
   const [stockDetail, setStockDetail] = useState<StockDetail | null>(null);
   const [showStockDetail, setShowStockDetail] = useState(false);
   const [loadingStockDetail, setLoadingStockDetail] = useState(false);
+  const [searchTimeout, setSearchTimeout] = useState<number | null>(null);
+
+  const debouncedSearch = useCallback(
+    (query: string) => {
+      // Clear any existing timeout
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+
+      // Set a new timeout for the search
+      const timeout = setTimeout(() => {
+        if (query && query.length >= 1) {
+          searchStocks(query);
+        }
+      }, 300); // 300ms delay
+
+      setSearchTimeout(timeout);
+    },
+    [searchTimeout]
+  );
 
   const searchStocks = async (query: string) => {
     if (query.length < 1) {
@@ -41,16 +59,8 @@ const SearchStock: React.FC<SearchStockProps> = ({ onAddStock }) => {
     try {
       setSearching(true);
       setSearchError(null);
-      const apiKey = import.meta.env.VITE_API_KEY;
 
-      if (!apiKey) {
-        setSearchError(
-          'API key not configured. Please set VITE_API_KEY in your environment variables.'
-        );
-        return;
-      }
-
-      const data = await ApiService.searchStocks(query, apiKey);
+      const data = await ApiService.searchStocks(query);
 
       if (!Array.isArray(data)) {
         setSearchError('Invalid response from stock search API');
@@ -67,13 +77,20 @@ const SearchStock: React.FC<SearchStockProps> = ({ onAddStock }) => {
             item.exchangeShortName || item.stockExchange || item.exchange || '',
           currency: item.currency || 'USD',
           stockExchange: item.stockExchange || item.exchange || '',
-        }));
+          id: `${item.symbol || item.ticker || ''}-${
+            item.exchange || item.stockExchange || ''
+          }`,
+        }))
+        // Remove duplicates based on symbol and exchange combination
+        .filter(
+          (stock, index, self) =>
+            index ===
+            self.findIndex(
+              (s) => s.symbol === stock.symbol && s.exchange === stock.exchange
+            )
+        );
 
       setSearchResults(stockResults);
-
-      if (stockResults.length === 0 && query.length > 0) {
-        setSearchError('No stocks found for your search query');
-      }
     } catch (err) {
       console.error('Failed to search stocks:', err);
       setSearchError('Failed to search stocks. Please try again.');
@@ -86,27 +103,12 @@ const SearchStock: React.FC<SearchStockProps> = ({ onAddStock }) => {
   const fetchStockDetail = async (stock: StockSearchResult) => {
     try {
       setLoadingStockDetail(true);
-      const apiKey = import.meta.env.VITE_API_KEY;
-
-      // Create stock detail with the available data and placeholder values for missing data
-      const stockDetail: StockDetail = {
-        symbol: stock.symbol,
-        name: stock.name,
-        exchange: stock.exchange,
-        exchangeShortName: stock.exchangeShortName,
-        currency: stock.currency || 'USD',
-        stockExchange: stock.stockExchange || stock.exchange,
-        // For now, using placeholder data - you can extend this with real API calls
-        // to fetch live price, volume, market cap, etc.
-        price: Math.random() * 1000, // Placeholder - replace with real API call
-        change: (Math.random() - 0.5) * 20, // Placeholder - replace with real API call
-        volume: Math.floor(Math.random() * 10000000), // Placeholder
-        marketCap: Math.random() * 100000000000, // Placeholder
-        pe: Math.random() * 50, // Placeholder
-        dividend: Math.random() * 5, // Placeholder
-      };
-
-      setStockDetail(stockDetail);
+      const quoteData = await ApiService.getStockQuote(stock.symbol);
+      if (!quoteData) {
+        setSearchError('Failed to fetch stock details from API');
+        return;
+      }
+      setStockDetail(quoteData);
       setShowStockDetail(true);
     } catch (err) {
       console.error('Failed to fetch stock details:', err);
@@ -119,8 +121,9 @@ const SearchStock: React.FC<SearchStockProps> = ({ onAddStock }) => {
   const handleSearchChange = (event: React.SyntheticEvent, value: string) => {
     setSearchQuery(value);
     setSearchError(null);
-    if (value) {
-      searchStocks(value);
+
+    if (value && value.length >= 1) {
+      debouncedSearch(value);
     } else {
       setSearchResults([]);
       setSelectedStock(null);
@@ -133,59 +136,26 @@ const SearchStock: React.FC<SearchStockProps> = ({ onAddStock }) => {
   ) => {
     setSelectedStock(stock);
     if (stock) {
-      setSearchQuery(stock.symbol);
-      // Fetch and show stock details
-      fetchStockDetail(stock);
+      // Don't change the search query when selecting - keep what user typed
+      // setSearchQuery(stock.symbol);
     }
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-
-    if (selectedStock && stockPrice && !isNaN(parseFloat(stockPrice))) {
-      const price = parseFloat(stockPrice);
-      onAddStock({
-        name: selectedStock.name,
-        price: price,
-      });
-
-      // Clear form after adding
-      setSearchQuery('');
-      setSelectedStock(null);
-      setStockPrice('');
-      setSearchResults([]);
-      setSearchError(null);
+  const handleViewStockDetails = () => {
+    if (selectedStock) {
+      fetchStockDetail(selectedStock);
     }
-  };
-
-  const handleAddToPortfolioFromDetail = (stock: StockDetail) => {
-    if (stockPrice && !isNaN(parseFloat(stockPrice))) {
-      const price = parseFloat(stockPrice);
-      onAddStock({
-        name: stock.name,
-        price: price,
-      });
-
-      // Clear form after adding
-      setSearchQuery('');
-      setSelectedStock(null);
-      setStockPrice('');
-      setSearchResults([]);
-      setSearchError(null);
-      setShowStockDetail(false);
-      setStockDetail(null);
-    }
-  };
-
-  const getOptionLabel = (option: StockSearchResult) => {
-    return `${option.symbol} - ${option.name}`;
   };
 
   const renderOption = (
     props: React.HTMLAttributes<HTMLLIElement>,
     option: StockSearchResult
   ) => (
-    <Box component="li" {...props}>
+    <Box
+      component="li"
+      {...props}
+      key={option.id || `${option.symbol}-${option.exchange}`}
+    >
       <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
         <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
           {option.symbol}
@@ -200,6 +170,14 @@ const SearchStock: React.FC<SearchStockProps> = ({ onAddStock }) => {
     </Box>
   );
 
+  useEffect(() => {
+    return () => {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+    };
+  }, [searchTimeout]);
+
   return (
     <>
       <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
@@ -213,14 +191,15 @@ const SearchStock: React.FC<SearchStockProps> = ({ onAddStock }) => {
           </Alert>
         )}
 
-        <Box
-          component="form"
-          onSubmit={handleSubmit}
-          sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
-        >
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <Autocomplete
             options={searchResults}
-            getOptionLabel={getOptionLabel}
+            getOptionLabel={(option) => `${option.symbol} - ${option.name}`}
+            isOptionEqualToValue={(option, value) =>
+              option.id === value.id ||
+              (option.symbol === value.symbol &&
+                option.exchange === value.exchange)
+            }
             renderOption={renderOption}
             value={selectedStock}
             onChange={handleStockSelect}
@@ -229,6 +208,9 @@ const SearchStock: React.FC<SearchStockProps> = ({ onAddStock }) => {
             loading={searching}
             filterOptions={(x) => x} // Disable built-in filtering since we're doing API search
             noOptionsText={searching ? 'Searching...' : 'No stocks found'}
+            freeSolo={false}
+            selectOnFocus={false}
+            clearOnBlur={false}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -238,6 +220,18 @@ const SearchStock: React.FC<SearchStockProps> = ({ onAddStock }) => {
                   ...params.InputProps,
                   endAdornment: (
                     <>
+                      {selectedStock && (
+                        <Box
+                          sx={{ display: 'flex', alignItems: 'center', mr: 1 }}
+                        >
+                          <Chip
+                            label={selectedStock.symbol}
+                            size="small"
+                            color="primary"
+                            variant="outlined"
+                          />
+                        </Box>
+                      )}
                       {searching ? (
                         <CircularProgress color="inherit" size={20} />
                       ) : null}
@@ -249,6 +243,20 @@ const SearchStock: React.FC<SearchStockProps> = ({ onAddStock }) => {
             )}
           />
 
+          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+            {selectedStock && (
+              <Button
+                variant="outlined"
+                onClick={handleViewStockDetails}
+                disabled={loadingStockDetail}
+                startIcon={
+                  loadingStockDetail ? <CircularProgress size={20} /> : null
+                }
+              >
+                {loadingStockDetail ? 'Loading...' : 'View Stock Details'}
+              </Button>
+            )}
+          </Box>
         </Box>
       </Paper>
 
@@ -260,7 +268,6 @@ const SearchStock: React.FC<SearchStockProps> = ({ onAddStock }) => {
           setShowStockDetail(false);
           setStockDetail(null);
         }}
-        onAddToPortfolio={handleAddToPortfolioFromDetail}
       />
     </>
   );

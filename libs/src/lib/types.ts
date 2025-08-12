@@ -1,14 +1,11 @@
 export interface Stock {
   name: string;
-  price: number;
-  change: number;
+  symbol: string;
 }
 
 export interface Portfolio {
   user: string;
-  stocks: Stock[];
-  total_price: number;
-  percentage_change: number;
+  stocks: { stock: Stock; quantity: number }[];
 }
 
 export interface StockSearchResult {
@@ -18,6 +15,7 @@ export interface StockSearchResult {
   exchangeShortName: string;
   currency?: string;
   stockExchange?: string;
+  id?: string; // Unique identifier for React keys
 }
 
 export interface StockDetail {
@@ -33,4 +31,14 @@ export interface StockDetail {
   marketCap?: number;
   pe?: number;
   dividend?: number;
+  // Additional fields from the quote API
+  dayLow?: number;
+  dayHigh?: number;
+  yearHigh?: number;
+  yearLow?: number;
+  open?: number;
+  previousClose?: number;
+  eps?: number;
+  sharesOutstanding?: number;
+  avgVolume?: number;
 }

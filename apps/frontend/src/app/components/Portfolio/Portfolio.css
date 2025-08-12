@@ -280,10 +280,6 @@
   cursor: not-allowed;
 }
 
-.stock-price-input {
-  min-width: 120px;
-}
-
 .add-stock-btn {
   margin-top: 10px;
 }

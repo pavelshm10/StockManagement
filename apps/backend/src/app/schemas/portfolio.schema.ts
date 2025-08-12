@@ -9,10 +9,7 @@ export class Stock {
   name: string;
 
   @Prop({ required: true })
-  price: number;
-
-  @Prop({ required: true })
-  change: number;
+  quantity: number;
 }
 
 @Schema()
@@ -22,12 +19,6 @@ export class Portfolio {
 
   @Prop({ type: [Stock], required: true })
   stocks: Stock[];
-
-  @Prop({ required: true })
-  total_price: number;
-
-  @Prop({ required: true })
-  percentage_change: number;
 }
 
 export const PortfolioSchema = SchemaFactory.createForClass(Portfolio);

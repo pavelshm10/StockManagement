@@ -24,8 +24,11 @@ export class ApiService {
   }
 
   // Stock search endpoint (external API)
-  static async searchStocks(query: string, apiKey: string): Promise<any> {
-    const searchUrl = `https://financialmodelingprep.com/api/v3/search?query=${encodeURIComponent(
+  static async searchStocks(query: string): Promise<any> {
+    const apiKey = import.meta.env.VITE_API_KEY;
+    const searchUrl = `${
+      import.meta.env.VITE_STOCK_API
+    }/search?query=${encodeURIComponent(
       query
     )}&limit=10&exchange=NASDAQ&apikey=${apiKey}`;
 
@@ -37,6 +40,27 @@ export class ApiService {
       return await response.json();
     } catch (error) {
       console.error('Stock search failed:', error);
+      throw error;
+    }
+  }
+
+  // Stock quote endpoint (external API) - get detailed stock information
+  static async getStockQuote(symbol: string): Promise<any> {
+    const apiKey = import.meta.env.VITE_API_KEY;
+    const quoteUrl = `${
+      import.meta.env.VITE_STOCK_API
+    }/quote/${symbol}?apikey=${apiKey}`;
+
+    try {
+      const response = await fetch(quoteUrl);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      const data = await response.json();
+      // The API returns an array, so we take the first item
+      return Array.isArray(data) ? data[0] : data;
+    } catch (error) {
+      console.error('Stock quote failed:', error);
       throw error;
     }
   }
