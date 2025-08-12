@@ -9,7 +9,22 @@ export class PortfolioService {
   async getPortfolio(user: string): Promise<Portfolio | null> {
     try {
       const portfolioModel = this.mongoDBService.getPortfolioModel();
-      const portfolio = await portfolioModel.findOne({ user }).exec();
+      const portfolio = await portfolioModel.findOne({ user: user }).exec();
+      if (portfolio) {
+        console.log(`📊 Portfolio data:`, JSON.stringify(portfolio, null, 2));
+      } else {
+        try {
+          const newPortfolio = await this.createPortfolio({
+            user: user,
+            stocks: [],
+          });
+          console.log(`✅ Created new portfolio for user: ${user}`);
+          return newPortfolio;
+        } catch (createError) {
+          return null;
+        }
+      }
+
       return portfolio;
     } catch (error) {
       throw error;

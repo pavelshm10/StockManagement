@@ -15,9 +15,14 @@ import Stock from '../Stock';
 import { StockSearchResult, StockDetail } from '@stock-management/libs';
 
 interface SearchStockProps {
+  onAddToPortfolio?: (stockData: {
+    name: string;
+    quantity: number;
+    symbol?: string;
+  }) => void;
 }
 
-const SearchStock: React.FC<SearchStockProps> = () => {
+const SearchStock: React.FC<SearchStockProps> = ({ onAddToPortfolio }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<StockSearchResult[]>([]);
   const [searching, setSearching] = useState(false);
@@ -268,6 +273,7 @@ const SearchStock: React.FC<SearchStockProps> = () => {
           setShowStockDetail(false);
           setStockDetail(null);
         }}
+        onAddToPortfolio={onAddToPortfolio}
       />
     </>
   );

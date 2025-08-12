@@ -13,86 +13,218 @@ import {
   TableRow,
   Box,
   Chip,
+  Button,
+  IconButton,
 } from '@mui/material';
+import { Delete as DeleteIcon } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
+
+interface PortfolioProps {
+  onLogout: () => void;
+}
 
 // Full Portfolio component with automatic data loading
-const Portfolio: React.FC = () => {
+const Portfolio: React.FC<PortfolioProps> = ({ onLogout }) => {
   const [portfolio, setPortfolio] = useState<PortfolioType | null>(null);
-  const [userId, setUserId] = useState('user1'); // Default user ID
+  const [user, setUser] = useState<any>(null);
   const hasFetched = useRef(false);
+  const navigate = useNavigate();
 
+  // Get user from localStorage on component mount
   useEffect(() => {
-    if (!hasFetched.current) {
-      hasFetched.current = true;
-      fetchPortfolio();
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      const userData = JSON.parse(savedUser);
+      setUser(userData);
+      console.log('👤 User loaded from localStorage:', userData);
+
+      // Fetch portfolio immediately when user is loaded
+      if (userData._id) {
+        console.log('📊 Fetching portfolio for user:', userData._id);
+        fetchPortfolio(userData._id);
+      } else {
+        console.warn('⚠️ User ID not found, cannot fetch portfolio');
+      }
+    } else {
+      console.warn('⚠️ No user found in localStorage');
     }
   }, []);
 
-  const fetchPortfolio = async () => {
+  const handleLogout = () => {
+    console.log('🔘 Logout button clicked');
+    localStorage.removeItem('user');
+    onLogout(); // Call parent logout callback
+  };
+
+  useEffect(() => {
+    if (user && user._id && !portfolio) {
+      fetchPortfolio(user._id);
+    }
+  }, [user, portfolio]);
+
+  const fetchPortfolio = async (userId: string) => {
     try {
-      try {
-        const data = await ApiService.getPortfolio(userId);
-        setPortfolio(data);
-      } catch (err: any) {
-        throw err;
+      console.log('🔍 Fetching portfolio for user ID:', userId);
+      const data = await ApiService.getPortfolio(userId);
+      console.log('📊 Portfolio data received:', data);
+      setPortfolio(data);
+    } catch (err: any) {
+      console.error('❌ Error fetching portfolio:', err);
+      // Don't throw the error, just log it and set portfolio to null
+      setPortfolio(null);
+    }
+  };
+
+  const handleAddToPortfolio = async (stockData: {
+    name: string;
+    quantity: number;
+    symbol?: string;
+  }) => {
+    if (!user || !portfolio) return;
+
+    try {
+      const newStock = {
+        stock: {
+          name: stockData.name,
+          symbol: stockData.symbol || stockData.name,
+        },
+        quantity: stockData.quantity,
+      };
+
+      const updatedPortfolio = await ApiService.updatePortfolio(user._id, {
+        stocks: [...portfolio.stocks, newStock],
+      });
+
+      if (updatedPortfolio) {
+        setPortfolio(updatedPortfolio);
       }
-    } catch (err) {
-      throw err;
+    } catch (error) {
+      console.error('Error adding stock to portfolio:', error);
+    }
+  };
+
+  const handleRemoveFromPortfolio = async (stockSymbol: string) => {
+    if (!user || !portfolio) return;
+
+    try {
+      console.log(`🗑️ Removing stock with symbol: ${stockSymbol}`);
+
+      // Filter out the stock to be removed (check both symbol and name as fallback)
+      const updatedStocks = portfolio.stocks.filter(
+        (stock) =>
+          stock.stock.symbol !== stockSymbol && stock.stock.name !== stockSymbol
+      );
+
+      const updatedPortfolio = await ApiService.updatePortfolio(user._id, {
+        stocks: updatedStocks,
+      });
+
+      if (updatedPortfolio) {
+        setPortfolio(updatedPortfolio);
+        console.log(`✅ Stock ${stockSymbol} removed from portfolio`);
+      }
+    } catch (error) {
+      console.error('Error removing stock from portfolio:', error);
     }
   };
   return (
     <Box sx={{ p: 3, maxWidth: 1200, margin: '0 auto' }}>
-      <Typography variant="h3" gutterBottom>
-        Hello, {userId}
-      </Typography>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 3,
+        }}
+      >
+        <Typography variant="h3">Hello, {user?.name || user?._id}</Typography>
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={handleLogout}
+          sx={{ ml: 2 }}
+        >
+          Logout
+        </Button>
+      </Box>
 
       {/* Stock Search and Add Section */}
-      {portfolio && <SearchStock />}
+      {portfolio ? (
+        <>
+          <SearchStock onAddToPortfolio={handleAddToPortfolio} />
 
-      {portfolio && portfolio.stocks.length > 0 && (
-        <Paper elevation={2} sx={{ p: 3 }}>
-          <Typography variant="h5" gutterBottom>
-            Stocks
+          {portfolio.stocks.length > 0 && (
+            <Paper elevation={2} sx={{ p: 3 }}>
+              <Typography variant="h5" gutterBottom>
+                Stocks
+              </Typography>
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>
+                        <Typography variant="subtitle1" fontWeight="bold">
+                          Name
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="subtitle1" fontWeight="bold">
+                          Quantity
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="subtitle1" fontWeight="bold">
+                          Actions
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {portfolio.stocks.map((stock, index) => (
+                      <TableRow key={stock.stock.symbol}>
+                        <TableCell>
+                          <Typography variant="body1">
+                            {stock.stock?.name}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body1" color="primary">
+                            {stock.quantity}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <IconButton
+                            onClick={() =>
+                              handleRemoveFromPortfolio(
+                                stock.stock.symbol || stock.stock.name
+                              )
+                            }
+                            color="error"
+                            size="small"
+                            title="Remove stock from portfolio"
+                            sx={{
+                              '&:hover': {
+                                backgroundColor: 'error.light',
+                                color: 'white',
+                              },
+                            }}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Paper>
+          )}
+        </>
+      ) : (
+        <Paper elevation={2} sx={{ p: 3, textAlign: 'center' }}>
+          <Typography variant="h6" color="text.secondary">
+            Loading portfolio...
           </Typography>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>
-                    <Typography variant="subtitle1" fontWeight="bold">
-                      Name
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="subtitle1" fontWeight="bold">
-                      Quantity
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="subtitle1" fontWeight="bold">
-                      Change
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {portfolio.stocks.map((stock, index) => (
-                  <TableRow key={stock.stock.symbol}>
-                    <TableCell>
-                      <Typography variant="body1">
-                        {stock.stock?.name}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body1" color="primary">
-                        ${stock.quantity}
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
         </Paper>
       )}
     </Box>

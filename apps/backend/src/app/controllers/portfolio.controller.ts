@@ -18,10 +18,19 @@ export class PortfolioController {
   @Get(':user')
   async getPortfolio(@Param('user') user: string) {
     try {
+      console.log(`🎯 Portfolio controller - GET request for user: ${user}`);
+      console.log(`🎯 User parameter type: ${typeof user}`);
+
       const portfolio = await this.portfolioService.getPortfolio(user);
+
+      console.log(
+        `🎯 Portfolio service returned:`,
+        portfolio ? 'Portfolio found' : 'No portfolio'
+      );
 
       return portfolio;
     } catch (error) {
+      console.error(`🎯 Portfolio controller error:`, error);
       throw error;
     }
   }

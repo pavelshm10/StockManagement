@@ -1,11 +1,16 @@
 export interface Stock {
   name: string;
-  symbol: string;
+  symbol?: string;
+}
+
+export interface PortfolioStock {
+  stock: Stock;
+  quantity: number;
 }
 
 export interface Portfolio {
   user: string;
-  stocks: { stock: Stock; quantity: number }[];
+  stocks: PortfolioStock[];
 }
 
 export interface StockSearchResult {

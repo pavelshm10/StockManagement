@@ -24,7 +24,11 @@ interface StockProps {
   stock: StockDetail | null;
   open: boolean;
   onClose: () => void;
-  onAddToPortfolio?: (stock: { name: string; quantity: number }) => void;
+  onAddToPortfolio?: (stock: {
+    name: string;
+    quantity: number;
+    symbol?: string;
+  }) => void;
 }
 
 const Stock: React.FC<StockProps> = ({
@@ -53,6 +57,7 @@ const Stock: React.FC<StockProps> = ({
       onAddToPortfolio({
         name: stock.name,
         quantity: parseFloat(stockQuantity),
+        symbol: stock.symbol,
       });
 
       // Clear form and close modal

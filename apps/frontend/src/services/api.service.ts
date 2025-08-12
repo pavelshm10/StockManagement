@@ -44,6 +44,23 @@ export class ApiService {
     }
   }
 
+  // User authentication endpoints
+  static async login(username: string): Promise<any> {
+    return httpService.post<any>('/user/login', { username });
+  }
+
+  static async register(userData: {
+    name: string;
+    email: string;
+    password: string;
+  }): Promise<any> {
+    return httpService.post<any>('/user/register', userData);
+  }
+
+  static async getUser(name: string): Promise<any> {
+    return httpService.get<any>(`/user/${name}`);
+  }
+
   // Stock quote endpoint (external API) - get detailed stock information
   static async getStockQuote(symbol: string): Promise<any> {
     const apiKey = import.meta.env.VITE_API_KEY;
