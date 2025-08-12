@@ -5,7 +5,7 @@ import {
   Portfolio as PortfolioType,
   Stock,
   StockSearchResult,
-} from '../../types/portfolio.types';
+} from '@stock-management/libs';
 
 // Full Portfolio component with automatic data loading
 const Portfolio: React.FC = () => {
@@ -76,93 +76,20 @@ const Portfolio: React.FC = () => {
       return;
     }
 
-    console.log('🔍 Searching for stocks:', query);
-
     try {
       setSearching(true);
-
-      // Make real API request to Financial Modeling Prep
-      const apiKey =
-        import.meta.env.VITE_FMP_API_KEY || 'sd0uxbcjuoaFhulC4OrGZs17vFu19ryl';
-      console.log('API Key found:', apiKey ? 'Yes' : 'No');
-
+      const apiKey = import.meta.env.VITE_API_KEY;
       const data = await ApiService.searchStocks(query, apiKey);
-      // Process real API data from searchStocks
-      console.log('📊 Raw API data:', data);
-
       const stockResults: StockSearchResult[] = data.map((item: any) => ({
         symbol: item.symbol || item.ticker || '',
         name: item.name || item.companyName || '',
         exchange: item.exchange || item.stockExchange || '',
         exchangeShortName: item.exchangeShortName || item.stockExchange || '',
       }));
-
-      console.log('📊 Processed stock results:', stockResults);
-
-      // Filter out any empty results
-      const validResults = stockResults.filter(
-        (stock) => stock.symbol && stock.name && stock.exchange
-      );
-      console.log({ validResults });
-
-      setSearchResults(validResults);
+      setSearchResults(stockResults);
       setShowDropdown(true);
     } catch (err) {
       console.error('Failed to search stocks:', err);
-      console.log('test ', import.meta.env.VITE_API_KEY);
-      // Fallback to mock data on error or if no API key
-      if (!import.meta.env.VITE_API_KEY) {
-        console.warn(
-          'No API key found in .env file. Using fallback key for testing.'
-        );
-        console.warn(
-          'To use your own API key, create apps/frontend/.env with VITE_FMP_API_KEY=your_key'
-        );
-        console.warn('Or edit src/config/api.ts to use a different approach');
-      }
-
-      // Use fallback data in case of error
-      const fallbackStocks: StockSearchResult[] = [
-        {
-          symbol: 'AAPL',
-          name: 'Apple Inc.',
-          exchange: 'NASDAQ',
-          exchangeShortName: 'NASDAQ',
-        },
-        {
-          symbol: 'GOOGL',
-          name: 'Alphabet Inc.',
-          exchange: 'NASDAQ',
-          exchangeShortName: 'NASDAQ',
-        },
-        {
-          symbol: 'MSFT',
-          name: 'Microsoft Corporation',
-          exchange: 'NASDAQ',
-          exchangeShortName: 'NASDAQ',
-        },
-        {
-          symbol: 'TSLA',
-          name: 'Tesla Inc.',
-          exchange: 'NASDAQ',
-          exchangeShortName: 'NASDAQ',
-        },
-        {
-          symbol: 'AMZN',
-          name: 'Amazon.com Inc.',
-          exchange: 'NASDAQ',
-          exchangeShortName: 'NASDAQ',
-        },
-      ];
-
-      const filteredResults = fallbackStocks.filter(
-        (stock: StockSearchResult) =>
-          stock.symbol.toLowerCase().includes(query.toLowerCase()) ||
-          stock.name.toLowerCase().includes(query.toLowerCase())
-      );
-
-      setSearchResults(filteredResults.slice(0, 10));
-      setShowDropdown(true);
     } finally {
       setSearching(false);
     }
@@ -175,7 +102,6 @@ const Portfolio: React.FC = () => {
   };
 
   const selectStock = (stock: StockSearchResult) => {
-    console.log('🎯 Stock selected:', stock);
     setSearchQuery(stock.symbol);
     setShowDropdown(false);
     setSearchResults([]);
@@ -193,9 +119,6 @@ const Portfolio: React.FC = () => {
 
   const addStock = async (stock: Omit<Stock, 'change'>) => {
     if (!portfolio) return;
-
-    console.log('📊 Adding stock to portfolio:', stock);
-
     const newStock: Stock = {
       ...stock,
       change: 0,
@@ -214,18 +137,14 @@ const Portfolio: React.FC = () => {
       total_price: totalPrice,
       percentage_change: percentageChange,
     };
-
-    console.log('📊 Updated portfolio:', updatedPortfolio);
-
     try {
       const data = await ApiService.updatePortfolio(userId, updatedPortfolio);
-      console.log('✅ Stock added successfully:', data);
+      console.log('Stock added successfully:', data);
       setPortfolio(data);
       setSearchQuery(''); // Clear search after adding
       setShowDropdown(false); // Hide dropdown
       setSearchResults([]); // Clear search results
     } catch (err) {
-      console.error('❌ Failed to add stock:', err);
       setError(err instanceof Error ? err.message : 'Failed to add stock');
     }
   };
@@ -240,19 +159,7 @@ const Portfolio: React.FC = () => {
 
   return (
     <div className="portfolio">
-      <h1>Portfolio</h1>
-
-      <div className="user-input">
-        <label htmlFor="userId">User ID: </label>
-        <input
-          id="userId"
-          type="text"
-          value={userId}
-          onChange={(e) => setUserId(e.target.value)}
-          placeholder="Enter user ID"
-        />
-        <button onClick={fetchPortfolio}>Load Portfolio</button>
-      </div>
+      <h1>Hello, {userId}</h1>
 
       {portfolio && (
         <div className="portfolio-summary">
@@ -311,8 +218,6 @@ const Portfolio: React.FC = () => {
               )}
             </div>
           </div>
-
-          {/* Stock Add Form */}
           <form
             onSubmit={(e) => {
               e.preventDefault();

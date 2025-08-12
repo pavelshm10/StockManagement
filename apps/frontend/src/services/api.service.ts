@@ -1,5 +1,5 @@
 import { httpService } from './http.service';
-import { Portfolio, Stock } from '../types/portfolio.types';
+import { Portfolio, Stock } from '@stock-management/libs';
 
 // API Service for Backend Communication
 export class ApiService {

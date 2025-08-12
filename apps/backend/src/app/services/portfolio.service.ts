@@ -19,12 +19,10 @@ export class PortfolioService {
   }
 
   async getPortfolio(user: string): Promise<Portfolio | null> {
-    console.log(`📊 Getting portfolio for user: ${user}`);
     return this.portfolios.get(user) || null;
   }
 
   async createPortfolio(portfolio: Portfolio): Promise<Portfolio> {
-    console.log(`📊 Creating portfolio for user: ${portfolio.user}`);
     this.portfolios.set(portfolio.user, portfolio);
     return portfolio;
   }
@@ -33,7 +31,6 @@ export class PortfolioService {
     user: string,
     portfolio: Partial<Portfolio>
   ): Promise<Portfolio | null> {
-    console.log(`📊 Updating portfolio for user: ${user}`);
     const existing = this.portfolios.get(user);
     if (!existing) {
       return null;
@@ -45,12 +42,10 @@ export class PortfolioService {
   }
 
   async getAllPortfolios(): Promise<Portfolio[]> {
-    console.log('📊 Getting all portfolios');
     return Array.from(this.portfolios.values());
   }
 
   async deletePortfolio(user: string): Promise<boolean> {
-    console.log(`📊 Deleting portfolio for user: ${user}`);
     return this.portfolios.delete(user);
   }
 }

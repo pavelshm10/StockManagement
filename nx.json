@@ -23,7 +23,8 @@
   },
   "projects": {
     "frontend": "apps/frontend",
-    "backend": "apps/backend"
+    "backend": "apps/backend",
+    "libs": "libs"
   },
   "targetDefaults": {
     "@nx/js:tsc": {
