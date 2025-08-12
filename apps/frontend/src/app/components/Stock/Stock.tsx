@@ -29,6 +29,7 @@ interface StockProps {
     quantity: number;
     symbol?: string;
   }) => void;
+  showAddToPortfolio?: boolean;
 }
 
 const Stock: React.FC<StockProps> = ({
@@ -36,6 +37,7 @@ const Stock: React.FC<StockProps> = ({
   open,
   onClose,
   onAddToPortfolio,
+  showAddToPortfolio = true,
 }) => {
   const [stockQuantity, setStockQuantity] = useState('1');
   const [quantityError, setQuantityError] = useState<string | null>(null);
@@ -365,33 +367,35 @@ const Stock: React.FC<StockProps> = ({
           )}
 
           {/* Add to Portfolio Section */}
-          <Paper elevation={1} sx={{ p: 2 }}>
-            <Typography
-              variant="h6"
-              gutterBottom
-              sx={{ color: 'primary.main' }}
-            >
-              Add to Portfolio
-            </Typography>
-            <TextField
-              label="Quantity"
-              type="number"
-              value={stockQuantity}
-              onChange={handleQuantityChange}
-              error={!!quantityError}
-              helperText={quantityError}
-              fullWidth
-              margin="normal"
-            />
-            <Button
-              variant="contained"
-              onClick={handleAddToPortfolio}
-              fullWidth
-              sx={{ mt: 2 }}
-            >
-              Add to Portfolio
-            </Button>
-          </Paper>
+          {showAddToPortfolio && (
+            <Paper elevation={1} sx={{ p: 2 }}>
+              <Typography
+                variant="h6"
+                gutterBottom
+                sx={{ color: 'primary.main' }}
+              >
+                Add to Portfolio
+              </Typography>
+              <TextField
+                label="Quantity"
+                type="number"
+                value={stockQuantity}
+                onChange={handleQuantityChange}
+                error={!!quantityError}
+                helperText={quantityError}
+                fullWidth
+                margin="normal"
+              />
+              <Button
+                variant="contained"
+                onClick={handleAddToPortfolio}
+                fullWidth
+                sx={{ mt: 2 }}
+              >
+                Add to Portfolio
+              </Button>
+            </Paper>
+          )}
         </Box>
       </DialogContent>
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ApiService from '../../../services/api.service';
 import SearchStock from '../SearchStock/SearchStock';
-import { Portfolio as PortfolioType, Stock } from '@stock-management/libs';
+import { Portfolio as PortfolioType, Stock as StockType } from '@stock-management/libs';
 import {
   Typography,
   Paper,
@@ -18,6 +18,8 @@ import {
 } from '@mui/material';
 import { Delete as DeleteIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import StockDetailDialog from '../Stock/Stock';
+
 
 interface PortfolioProps {
   onLogout: () => void;
@@ -27,6 +29,8 @@ interface PortfolioProps {
 const Portfolio: React.FC<PortfolioProps> = ({ onLogout }) => {
   const [portfolio, setPortfolio] = useState<PortfolioType | null>(null);
   const [user, setUser] = useState<any>(null);
+  const [selectedStock, setSelectedStock] = useState<any>(null);
+  const [showStockDetail, setShowStockDetail] = useState(false);
   const hasFetched = useRef(false);
   const navigate = useNavigate();
 
@@ -127,6 +131,24 @@ const Portfolio: React.FC<PortfolioProps> = ({ onLogout }) => {
       console.error('Error removing stock from portfolio:', error);
     }
   };
+
+  const handleStockClick = async (stock: any) => {
+    try {
+      console.log(`🔍 Opening stock details for: ${stock.stock.name}`);
+      
+      // Fetch detailed stock information
+      const stockDetail = await ApiService.getStockQuote(stock.stock.symbol || stock.stock.name);
+      
+      if (stockDetail) {
+        setSelectedStock(stockDetail);
+        setShowStockDetail(true);
+      } else {
+        console.warn('⚠️ Could not fetch stock details');
+      }
+    } catch (error) {
+      console.error('❌ Error fetching stock details:', error);
+    }
+  };
   return (
     <Box sx={{ p: 3, maxWidth: 1200, margin: '0 auto' }}>
       <Box
@@ -183,7 +205,18 @@ const Portfolio: React.FC<PortfolioProps> = ({ onLogout }) => {
                     {portfolio.stocks.map((stock, index) => (
                       <TableRow key={stock.stock.symbol}>
                         <TableCell>
-                          <Typography variant="body1">
+                          <Typography 
+                            variant="body1"
+                            onClick={() => handleStockClick(stock)}
+                            sx={{
+                              cursor: 'pointer',
+                              color: 'primary.main',
+                              '&:hover': {
+                                textDecoration: 'underline',
+                                color: 'primary.dark',
+                              },
+                            }}
+                          >
                             {stock.stock?.name}
                           </Typography>
                         </TableCell>
@@ -227,6 +260,17 @@ const Portfolio: React.FC<PortfolioProps> = ({ onLogout }) => {
           </Typography>
         </Paper>
       )}
+
+      {/* Stock Detail Dialog */}
+      <StockDetailDialog
+        stock={selectedStock}
+        open={showStockDetail}
+        onClose={() => {
+          setShowStockDetail(false);
+          setSelectedStock(null);
+        }}
+        showAddToPortfolio={false}
+      />
     </Box>
   );
 };
