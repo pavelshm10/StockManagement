@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ApiService from '../../../services/api.service';
 import SearchStock from '../SearchStock/SearchStock';
-import { Portfolio as PortfolioType, Stock as StockType } from '@stock-management/libs';
+import {
+  Portfolio as PortfolioType,
+  Stock as StockType,
+} from '@stock-management/libs';
 import {
   Typography,
   Paper,
@@ -19,7 +22,6 @@ import {
 import { Delete as DeleteIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import StockDetailDialog from '../Stock/Stock';
-
 
 interface PortfolioProps {
   onLogout: () => void;
@@ -135,10 +137,10 @@ const Portfolio: React.FC<PortfolioProps> = ({ onLogout }) => {
   const handleStockClick = async (stock: any) => {
     try {
       console.log(`🔍 Opening stock details for: ${stock.stock.name}`);
-      
       // Fetch detailed stock information
-      const stockDetail = await ApiService.getStockQuote(stock.stock.symbol || stock.stock.name);
-      
+      const stockDetail = await ApiService.getStockQuote(
+        stock.stock.symbol || stock.stock.name
+      );
       if (stockDetail) {
         setSelectedStock(stockDetail);
         setShowStockDetail(true);
@@ -205,7 +207,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onLogout }) => {
                     {portfolio.stocks.map((stock, index) => (
                       <TableRow key={stock.stock.symbol}>
                         <TableCell>
-                          <Typography 
+                          <Typography
                             variant="body1"
                             onClick={() => handleStockClick(stock)}
                             sx={{
